@@ -1,0 +1,153 @@
+/* Utilitarian Minimalism & Editorial Design System */
+
+:root {
+  --canvas: #FBFBFA;
+  --surface: #FFFFFF;
+  --border: #EAEAEA;
+  --ink-primary: #121212;
+  --ink-secondary: #6E6D6A;
+  --ink-muted: #9E9D99;
+}
+
+.dark {
+  --canvas: #0D0F12;
+  --surface: #14171D;
+  --border: #22262E;
+  --ink-primary: #E8E8E6;
+  --ink-secondary: #A8A7A3;
+  --ink-muted: #6A6D75;
+}
+
+/* Base typography refinements */
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Micro-transitions */
+button, a, input, textarea {
+  transition: all 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E2E1DC;
+  border-radius: 2px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2D323D;
+}
+
+/* Keystroke Micro-UI <kbd> */
+kbd {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: #F0EFEA;
+  border: 1px solid #E2E1DC;
+  color: #6E6D6A;
+}
+.dark kbd {
+  background-color: #1A1E26;
+  border-color: #2D323D;
+  color: #A8A7A3;
+}
+
+/* Flat Range Slider */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #121212;
+  cursor: pointer;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: transform 120ms ease;
+}
+.dark input[type="range"]::-webkit-slider-thumb {
+  background: #E8E8E6;
+  border: 2px solid #14171D;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Semantic Badges: Strictly Muted Pastels (No Gradients, No Heavy Shadows) */
+.badge-buy {
+  background-color: #EDF3EC;
+  color: #2B6434;
+  border-color: #D2E3D1;
+}
+.dark .badge-buy {
+  background-color: rgba(43, 100, 52, 0.18);
+  color: #88C493;
+  border-color: rgba(136, 196, 147, 0.3);
+}
+
+.badge-hold {
+  background-color: #FBF3DB;
+  color: #8C5E00;
+  border-color: #F5E6B8;
+}
+.dark .badge-hold {
+  background-color: rgba(140, 94, 0, 0.18);
+  color: #E2B653;
+  border-color: rgba(226, 182, 83, 0.3);
+}
+
+.badge-sell {
+  background-color: #FDEBEC;
+  color: #9F2F2D;
+  border-color: #F9D2D4;
+}
+.dark .badge-sell {
+  background-color: rgba(159, 47, 45, 0.18);
+  color: #E68583;
+  border-color: rgba(230, 133, 131, 0.3);
+}
+
+/* Aspect Color Badges (Calibrated Muted Pastels) */
+.aspect-economy       { background-color: #E1F3FE; color: #1F6C9F; border: 1px solid #C6E5FD; }
+.aspect-monetary      { background-color: #EDE8F7; color: #523A7E; border: 1px solid #D9CEF0; }
+.aspect-inflation     { background-color: #FBF3DB; color: #8C5E00; border: 1px solid #F5E6B8; }
+.aspect-unemployment  { background-color: #FDEFE6; color: #9A461E; border: 1px solid #F8D9C5; }
+.aspect-manufacturing { background-color: #EDF3EC; color: #2B6434; border: 1px solid #D2E3D1; }
+.aspect-financial     { background-color: #E6ECFA; color: #2E468A; border: 1px solid #CCD8F5; }
+.aspect-market        { background-color: #F0EFEA; color: #4E4D48; border: 1px solid #E0DFD8; }
+
+.dark .aspect-economy       { background-color: rgba(31, 108, 159, 0.18); color: #82C4EE; border-color: rgba(130, 196, 238, 0.3); }
+.dark .aspect-monetary      { background-color: rgba(82, 58, 126, 0.18);  color: #BBA7DF; border-color: rgba(187, 167, 223, 0.3); }
+.dark .aspect-inflation     { background-color: rgba(140, 94, 0, 0.18);   color: #E2B653; border-color: rgba(226, 182, 83, 0.3); }
+.dark .aspect-unemployment  { background-color: rgba(154, 70, 30, 0.18);  color: #E69D7D; border-color: rgba(230, 157, 125, 0.3); }
+.dark .aspect-manufacturing { background-color: rgba(43, 100, 52, 0.18);  color: #88C493; border-color: rgba(136, 196, 147, 0.3); }
+.dark .aspect-financial     { background-color: rgba(46, 70, 138, 0.18);  color: #8EA7E8; border-color: rgba(142, 167, 232, 0.3); }
+.dark .aspect-market        { background-color: rgba(78, 77, 72, 0.18);   color: #C0BFB8; border-color: rgba(192, 191, 184, 0.3); }
+
+/* Navigation Tab States */
+.tab-btn.active-tab {
+  background-color: #FFFFFF;
+  color: #121212;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.dark .tab-btn.active-tab {
+  background-color: #242832;
+  color: #FFFFFF;
+}
+
+/* Clean Accordion Lines */
+.editorial-line {
+  border-bottom: 1px solid var(--border);
+}

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Pakar S&P 500 : FiGAS & MYCIN Engine</title>
+  
+  <!-- Premium Typographic Hierarchy: Geist Sans, Newsreader Serif, and Geist Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            mono: ['Geist Mono', 'SF Mono', 'monospace'],
+          },
+          colors: {
+            canvas: {
+              light: '#FBFBFA',
+              dark: '#0D0F12',
+            },
+            surface: {
+              light: '#FFFFFF',
+              dark: '#14171D',
+            },
+            borderUti: {
+              light: '#EAEAEA',
+              dark: '#22262E',
+            },
+            ink: {
+              primary: '#121212',
+              secondary: '#6E6D6A',
+              muted: '#9E9D99',
+            },
+            // Strictly calibrated spot pastels per minimalist protocol
+            pastel: {
+              green: '#EDF3EC',
+              greenText: '#2B6434',
+              greenBorder: '#D2E3D1',
+              yellow: '#FBF3DB',
+              yellowText: '#8C5E00',
+              yellowBorder: '#F5E6B8',
+              red: '#FDEBEC',
+              redText: '#9F2F2D',
+              redBorder: '#F9D2D4',
+              blue: '#E1F3FE',
+              blueText: '#1F6C9F',
+              blueBorder: '#C6E5FD',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="min-h-[100dvh] bg-[#FBFBFA] dark:bg-[#0D0F12] text-[#121212] dark:text-[#E8E8E6] font-sans antialiased selection:bg-[#E1F3FE] selection:text-[#1F6C9F]">
+
+  <!-- TOP EDITORIAL MASTHEAD -->
+  <header class="sticky top-0 z-40 bg-[#FBFBFA]/90 dark:bg-[#0D0F12]/90 backdrop-blur border-b border-[#EAEAEA] dark:border-[#22262E]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Monogram & Title -->
+      <div class="flex items-center space-x-3.5">
+        <div class="w-8 h-8 rounded border border-[#121212] dark:border-[#EAEAEA] bg-[#121212] dark:bg-[#EAEAEA] text-[#FFFFFF] dark:text-[#121212] flex items-center justify-center font-mono font-bold text-xs tracking-tight">
+          SP
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-semibold tracking-tight text-[#121212] dark:text-[#E8E8E6] leading-none">
+              Sistem Pakar S&amp;P 500
+            </h1>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-[#F0EFEA] dark:bg-[#1E222A] text-[#6E6D6A] dark:text-[#A8A7A3] border border-[#EAEAEA] dark:border-[#2E333D]">
+              v1.0 / MYCIN
+            </span>
+          </div>
+          <p class="text-[11px] text-[#6E6D6A] dark:text-[#9E9D99] mt-0.5 hidden sm:block font-serif italic">
+            Inferensi keputusan pasar berbasis aspek sentimen FiGAS dan kepastian aturan IF-THEN
+          </p>
+        </div>
+      </div>
+
+      <!-- Center Minimalist Tab Strip -->
+      <nav class="flex items-center space-x-1 p-1 rounded-md bg-[#F0EFEA] dark:bg-[#1A1D24] border border-[#EAEAEA] dark:border-[#262B35] text-xs font-medium">
+        <button onclick="switchTab('simulator')" id="tab-btn-simulator" class="tab-btn active-tab px-3 py-1 rounded transition text-[#121212] dark:text-white bg-white dark:bg-[#262A34] shadow-none">
+          Simulator
+        </button>
+        <button onclick="switchTab('historical')" id="tab-btn-historical" class="tab-btn px-3 py-1 rounded transition text-[#6E6D6A] dark:text-[#9E9D99] hover:text-[#121212] dark:hover:text-white">
+          Data Historis
+        </button>
+        <button onclick="switchTab('rules')" id="tab-btn-rules" class="tab-btn px-3 py-1 rounded transition text-[#6E6D6A] dark:text-[#9E9D99] hover:text-[#121212] dark:hover:text-white">
+          Knowledge Base
+        </button>
+        <button onclick="switchTab('evaluation')" id="tab-btn-evaluation" class="tab-btn px-3 py-1 rounded transition text-[#6E6D6A] dark:text-[#9E9D99] hover:text-[#121212] dark:hover:text-white">
+          Evaluasi &amp; Tolok Ukur
+        </button>
+      </nav>
+
+      <!-- Right Actions: Authors & Minimalist Theme Toggle -->
+      <div class="flex items-center space-x-2">
+        <button onclick="openAuthorsModal()" class="px-2.5 py-1 text-xs font-mono rounded border border-[#EAEAEA] dark:border-[#2A2F3A] bg-white dark:bg-[#181B22] text-[#6E6D6A] dark:text-[#B0AFA9] hover:border-[#121212] dark:hover:border-white transition">
+          Tim Pengembang
+        </button>
+        <button onclick="toggleDarkMode()" class="p-1.5 rounded border border-[#EAEAEA] dark:border-[#2A2F3A] bg-white dark:bg-[#181B22] text-[#6E6D6A] dark:text-[#B0AFA9] hover:text-[#121212] dark:hover:text-white transition" title="Ganti Tema">
+          <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m14.14-14.14l-1.41 1.41"></path>
+          </svg>
+          <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ==================== TAB 1: SIMULATOR (BENTO EDITORIAL) ==================== -->
+    <div id="tab-simulator" class="tab-content block space-y-6">
+
+      <!-- Scenario Presets Bar (Utilitarian Keystroke Style) -->
+      <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center space-x-2">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-[#9E9D99]">Skenario Uji:</span>
+            <span class="text-[#6E6D6A] dark:text-[#8C8B87] hidden md:inline">Pilih skenario pasar untuk mengamati respon inferensi</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="loadPreset('ratecut')" class="preset-btn px-2.5 py-1 rounded text-xs font-mono border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] hover:border-[#121212] dark:hover:border-white transition">
+              <kbd class="text-[10px] text-[#8C8B87] mr-1">1</kbd>Pelonggaran Moneter Fed
+            </button>
+            <button onclick="loadPreset('inflation')" class="preset-btn px-2.5 py-1 rounded text-xs font-mono border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] hover:border-[#121212] dark:hover:border-white transition">
+              <kbd class="text-[10px] text-[#8C8B87] mr-1">2</kbd>Lonjakan Inflasi &amp; Bunga
+            </button>
+            <button onclick="loadPreset('contrarian')" class="preset-btn px-2.5 py-1 rounded text-xs font-mono border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] hover:border-[#121212] dark:hover:border-white transition">
+              <kbd class="text-[10px] text-[#8C8B87] mr-1">3</kbd>Panik + Oversold (Kontrarian)
+            </button>
+            <button onclick="loadPreset('calm')" class="preset-btn px-2.5 py-1 rounded text-xs font-mono border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] hover:border-[#121212] dark:hover:border-white transition">
+              <kbd class="text-[10px] text-[#8C8B87] mr-1">4</kbd>Pasar Tenang &amp; Datar
+            </button>
+            <button onclick="loadPreset('conflict')" class="preset-btn px-2.5 py-1 rounded text-xs font-mono border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] hover:border-[#121212] dark:hover:border-white transition">
+              <kbd class="text-[10px] text-[#8C8B87] mr-1">5</kbd>Resolusi Konflik (HOLD)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Grid: Asymmetrical Two-Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT INPUT COLUMN (5 Columns) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-5">
+            <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+              <h2 class="text-sm font-semibold tracking-tight text-[#121212] dark:text-white uppercase font-mono">
+                Parameter Masukan
+              </h2>
+              <span class="text-[11px] font-mono text-[#9E9D99]">Live Evaluasi</span>
+            </div>
+
+            <!-- Headline Textarea -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-medium text-[#121212] dark:text-[#E8E8E6]">Headline Berita Finansial (satu per baris)</label>
+                <button onclick="clearHeadlines()" class="text-[11px] font-mono text-[#9E9D99] hover:text-[#9F2F2D] transition">Hapus Teks</button>
+              </div>
+              <textarea id="input-headlines" rows="4" 
+                class="w-full text-xs font-mono px-3 py-2.5 bg-[#FBFBFA] dark:bg-[#1A1E26] border border-[#EAEAEA] dark:border-[#2A2F3A] rounded focus:border-[#121212] dark:focus:border-[#E8E8E6] focus:outline-none transition leading-relaxed text-[#121212] dark:text-[#E8E8E6]"
+                placeholder="Masukkan judul berita ekonomi..."></textarea>
+              <p class="text-[11px] text-[#6E6D6A] dark:text-[#8C8B87] mt-1 font-serif italic">
+                Tiap kata dicocokkan dengan kamus ekonomi berbobot [-1.0 s/d +1.0] dan Token of Interest FiGAS.
+              </p>
+            </div>
+
+            <!-- Slider: Trend vs MA20 -->
+            <div class="space-y-1.5 pt-3 border-t border-[#EAEAEA] dark:border-[#22262E]">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-[#121212] dark:text-[#E8E8E6]">Tren Harga vs MA20</span>
+                <span id="label-trend-val" class="font-mono font-medium text-[#121212] dark:text-[#E8E8E6] tabular-nums">0.0% (flat)</span>
+              </div>
+              <input type="range" id="input-trend" min="-0.15" max="0.10" step="0.005" value="0.00"
+                class="w-full h-1.5 bg-[#EAEAEA] dark:bg-[#2A2E38] rounded appearance-none cursor-pointer accent-[#121212] dark:accent-white">
+              <div class="flex justify-between text-[10px] font-mono text-[#9E9D99]">
+                <span>&lt; -6.0% (Oversold)</span>
+                <span>-2.0% s/d +2.0% (Flat)</span>
+                <span>&gt; +5.0% (Overextended)</span>
+              </div>
+            </div>
+
+            <!-- Slider: Volatility -->
+            <div class="space-y-1.5 pt-3 border-t border-[#EAEAEA] dark:border-[#22262E]">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-[#121212] dark:text-[#E8E8E6]">Volatilitas Harian Pasar</span>
+                <span id="label-vol-val" class="font-mono font-medium text-[#121212] dark:text-[#E8E8E6] tabular-nums">0.010 (normal)</span>
+              </div>
+              <input type="range" id="input-vol" min="0.002" max="0.035" step="0.001" value="0.010"
+                class="w-full h-1.5 bg-[#EAEAEA] dark:bg-[#2A2E38] rounded appearance-none cursor-pointer accent-[#121212] dark:accent-white">
+              <div class="flex justify-between text-[10px] font-mono text-[#9E9D99]">
+                <span>&le; 0.006 (Low)</span>
+                <span>0.007 - 0.017 (Normal)</span>
+                <span>&ge; 0.018 (High)</span>
+              </div>
+            </div>
+
+            <!-- Slider: Previous Sentiment Baseline -->
+            <div class="space-y-1.5 pt-3 border-t border-[#EAEAEA] dark:border-[#22262E]">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-[#121212] dark:text-[#E8E8E6]">Sentimen Periode Sebelumnya</span>
+                <span id="label-prevsent-val" class="font-mono font-medium text-[#121212] dark:text-[#E8E8E6] tabular-nums">0.00 (stable)</span>
+              </div>
+              <input type="range" id="input-prevsent" min="-0.30" max="0.30" step="0.01" value="0.00"
+                class="w-full h-1.5 bg-[#EAEAEA] dark:bg-[#2A2E38] rounded appearance-none cursor-pointer accent-[#121212] dark:accent-white">
+              <div class="flex justify-between text-[10px] font-mono text-[#9E9D99]">
+                <span>-0.30 (Pesimis)</span>
+                <span>0.00 (Netral)</span>
+                <span>+0.30 (Optimis)</span>
+              </div>
+            </div>
+
+            <!-- Filler Toggle -->
+            <div class="pt-3 border-t border-[#EAEAEA] dark:border-[#22262E] flex items-center justify-between">
+              <label for="check-filler" class="text-xs text-[#6E6D6A] dark:text-[#8C8B87] cursor-pointer">
+                Sertakan 3 headline pengisi netral (Realisme pasar)
+              </label>
+              <input type="checkbox" id="check-filler" checked
+                class="w-4 h-4 rounded border-[#EAEAEA] dark:border-[#2A2F3A] accent-[#121212] dark:accent-white cursor-pointer">
+            </div>
+
+            <!-- Primary Execute CTA (Strict Utilitarian Solid Button) -->
+            <button onclick="runAnalysis()" class="w-full py-2.5 px-4 rounded text-xs font-mono font-medium text-white dark:text-[#121212] bg-[#121212] dark:bg-white hover:bg-[#2B2B2B] dark:hover:bg-[#E0E0DE] active:scale-[0.98] transition">
+              Jalankan Inferensi Forward Chaining
+            </button>
+          </div>
+
+          <!-- Linguistic Facts Card (Fuzzified State) -->
+          <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-[#9E9D99]">
+                Fakta Linguistik (Fuzzifikasi)
+              </h3>
+              <span class="text-[10px] font-mono text-[#6E6D6A]">12 Variabel</span>
+            </div>
+            <div id="facts-chips-container" class="flex flex-wrap gap-1.5 text-xs font-mono">
+              <span class="px-2 py-0.5 rounded bg-[#F0EFEA] dark:bg-[#1A1E26] text-[#6E6D6A] border border-[#EAEAEA] dark:border-[#2A2E38]">
+                Memuat fakta...
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT OUTPUT & EXPLANATION COLUMN (7 Columns) -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <!-- RECOMMENDATION HERO BLOCK (Editorial Bento Top Tile) -->
+          <div id="hero-decision-card" class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EAEAEA] dark:border-[#22262E] pb-5">
+              <div>
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#9E9D99] block">
+                  Keputusan Sistem Pakar
+                </span>
+                <div class="flex items-baseline space-x-3 mt-1.5">
+                  <div id="badge-decision" class="text-2xl font-mono font-bold px-3 py-1 rounded border inline-flex items-center space-x-2">
+                    <span id="badge-dot-indicator" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span id="badge-decision-text">HOLD</span>
+                  </div>
+                  <div class="flex items-baseline space-x-1.5">
+                    <span class="text-xs font-mono text-[#6E6D6A]">CF Akumulasi:</span>
+                    <span id="badge-cf-text" class="text-lg font-mono font-bold tabular-nums text-[#121212] dark:text-white">0.00</span>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:max-w-xs text-left sm:text-right">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-[#9E9D99] block">Status Resolusi</span>
+                <p id="resolution-reason-text" class="text-xs text-[#6E6D6A] dark:text-[#A8A7A3] mt-1 leading-relaxed font-sans">
+                  Menunggu eksekusi aturan...
+                </p>
+              </div>
+            </div>
+
+            <!-- MYCIN Compound Breakdown Bars -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-[#6E6D6A] dark:text-[#9E9D99]">Akumulasi Certainty Factor per Sinyal:</span>
+                <span class="text-[10px] text-[#9E9D99]">Ambang Batas &ge; 0.30 &bull; Margin &ge; 0.15</span>
+              </div>
+
+              <!-- BUY -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-mono">
+                  <span class="text-[#2B6434] dark:text-[#88C493] font-medium flex items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#2B6434] mr-1.5"></span>BUY (Beli / Rebound Kontrarian)
+                  </span>
+                  <span id="val-cf-buy" class="tabular-nums font-bold">0.00</span>
+                </div>
+                <div class="h-2 w-full bg-[#F0EFEA] dark:bg-[#1E222A] rounded-full overflow-hidden">
+                  <div id="bar-cf-buy" class="h-full bg-[#2B6434] dark:bg-[#52A360] rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- HOLD -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-mono">
+                  <span class="text-[#8C5E00] dark:text-[#D8A63A] font-medium flex items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#8C5E00] mr-1.5"></span>HOLD (Tahan / Konservatif)
+                  </span>
+                  <span id="val-cf-hold" class="tabular-nums font-bold">0.00</span>
+                </div>
+                <div class="h-2 w-full bg-[#F0EFEA] dark:bg-[#1E222A] rounded-full overflow-hidden">
+                  <div id="bar-cf-hold" class="h-full bg-[#8C5E00] dark:bg-[#D8A63A] rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- SELL -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-mono">
+                  <span class="text-[#9F2F2D] dark:text-[#DE7775] font-medium flex items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#9F2F2D] mr-1.5"></span>SELL (Jual / Lindung Nilai)
+                  </span>
+                  <span id="val-cf-sell" class="tabular-nums font-bold">0.00</span>
+                </div>
+                <div class="h-2 w-full bg-[#F0EFEA] dark:bg-[#1E222A] rounded-full overflow-hidden">
+                  <div id="bar-cf-sell" class="h-full bg-[#9F2F2D] dark:bg-[#DE7775] rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FIRED RULES & REASONING TRACE (Explainability Tile) -->
+          <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+              <h3 class="text-sm font-semibold tracking-tight text-[#121212] dark:text-white font-mono uppercase">
+                Aturan yang Terpenuhi (Inference Trace)
+              </h3>
+              <span id="fired-rules-count-badge" class="text-xs font-mono px-2 py-0.5 rounded border border-[#EAEAEA] dark:border-[#2A2E38] bg-[#FBFBFA] dark:bg-[#1A1E26] text-[#6E6D6A]">
+                0 Aturan Aktif
+              </span>
+            </div>
+
+            <!-- List of activated rules -->
+            <div id="fired-rules-container" class="space-y-3">
+              <p class="text-xs text-[#9E9D99] font-serif italic">Tidak ada aturan yang aktif.</p>
+            </div>
+
+            <!-- MYCIN Mathematical Combination Sequence -->
+            <div class="pt-3 border-t border-[#EAEAEA] dark:border-[#22262E] space-y-2">
+              <h4 class="text-[11px] font-mono uppercase tracking-wider text-[#9E9D99]">
+                Rincian Rumus Kombinasi MYCIN:
+              </h4>
+              <div class="rounded bg-[#FBFBFA] dark:bg-[#1A1E26] border border-[#EAEAEA] dark:border-[#2A2E38] p-3 text-xs font-mono text-[#6E6D6A] dark:text-[#A8A7A3] space-y-1.5">
+                <div>Formula: <code class="text-[#121212] dark:text-white font-bold">CF_gabungan = CF₁ + CF₂ × (1 - CF₁)</code></div>
+                <div id="mycin-steps-list" class="space-y-1 pt-1 text-[11px]">
+                  <!-- Rendered via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ASPECT SENTIMENT TOKEN INSPECTOR (FiGAS Module) -->
+          <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+              <h3 class="text-sm font-semibold tracking-tight text-[#121212] dark:text-white font-mono uppercase">
+                Inspeksi Token &amp; Aspek Berita (FiGAS)
+              </h3>
+              <span class="text-[10px] font-mono text-[#9E9D99]">±5 Jendela Kata</span>
+            </div>
+            <div id="headline-tokens-container" class="space-y-3">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: HISTORICAL EXPLORER ==================== -->
+    <div id="tab-historical" class="tab-content hidden space-y-6">
+      <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6">
+        <div class="max-w-3xl">
+          <h2 class="text-base font-semibold text-[#121212] dark:text-white">
+            Eksplorasi Tanggal Historis S&amp;P 500 (2008 &ndash; 2024)
+          </h2>
+          <p class="text-xs text-[#6E6D6A] dark:text-[#9E9D99] mt-1 font-serif italic">
+            Validasi perilaku sistem pakar pada peristiwa makroekonomi nyata dengan membandingkan rekomendasi sistem terhadap return pasar sesudahnya (<code class="font-mono text-[11px]">ret_next</code>).
+          </p>
+        </div>
+
+        <!-- Curated Historical Event Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" id="historical-events-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: KNOWLEDGE BASE CATALOG ==================== -->
+    <div id="tab-rules" class="tab-content hidden space-y-6">
+      <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-semibold text-[#121212] dark:text-white font-mono uppercase">
+              Knowledge Base (16 Aturan IF–THEN)
+            </h2>
+            <p class="text-xs text-[#6E6D6A] dark:text-[#9E9D99] mt-0.5 font-serif italic">
+              Landasan teori: Barbaglia et al. (2022), Maghyereh &amp; Abdoh (2022), dan data latih &le; 2019.
+            </p>
+          </div>
+          <!-- Filter Buttons -->
+          <div class="flex items-center space-x-1 border border-[#EAEAEA] dark:border-[#2E333D] bg-[#FBFBFA] dark:bg-[#1A1E26] p-1 rounded text-xs font-mono">
+            <button onclick="filterRules('ALL')" class="rule-filter-btn px-2.5 py-0.5 rounded bg-white dark:bg-[#282C36] text-[#121212] dark:text-white">Semua (16)</button>
+            <button onclick="filterRules('BUY')" class="rule-filter-btn px-2.5 py-0.5 rounded text-[#2B6434] hover:bg-white/50">BUY (6)</button>
+            <button onclick="filterRules('HOLD')" class="rule-filter-btn px-2.5 py-0.5 rounded text-[#8C5E00] hover:bg-white/50">HOLD (5)</button>
+            <button onclick="filterRules('SELL')" class="rule-filter-btn px-2.5 py-0.5 rounded text-[#9F2F2D] hover:bg-white/50">SELL (5)</button>
+          </div>
+        </div>
+
+        <!-- Rules Table (Editorial Style) -->
+        <div class="overflow-x-auto border border-[#EAEAEA] dark:border-[#22262E] rounded">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#FBFBFA] dark:bg-[#181B22] text-[#9E9D99] font-mono border-b border-[#EAEAEA] dark:border-[#22262E]">
+              <tr>
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Nama Aturan</th>
+                <th class="py-2.5 px-3">Premis (Kondisi IF)</th>
+                <th class="py-2.5 px-3">Aksi</th>
+                <th class="py-2.5 px-3">CF</th>
+                <th class="py-2.5 px-3">Justifikasi Teoretis / Empiris</th>
+              </tr>
+            </thead>
+            <tbody id="rules-table-body" class="divide-y divide-[#EAEAEA] dark:divide-[#22262E] font-sans">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: EVALUATION & BENCHMARKS ==================== -->
+    <div id="tab-evaluation" class="tab-content hidden space-y-6">
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- 20 Test Cases Card -->
+        <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+            <div>
+              <h3 class="text-sm font-semibold text-[#121212] dark:text-white font-mono uppercase">
+                20 Regression Test Cases
+              </h3>
+              <p class="text-xs text-[#6E6D6A] dark:text-[#9E9D99]">Uji konsistensi perilaku forward chaining</p>
+            </div>
+            <span id="tc-badge-status" class="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[#EDF3EC] text-[#2B6434] border border-[#D2E3D1]">
+              20/20 Lulus (100%)
+            </span>
+          </div>
+          <div class="overflow-y-auto max-h-[380px] space-y-2 pr-1" id="test-cases-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- 8 NLP Unit Tests Card -->
+        <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+            <div>
+              <h3 class="text-sm font-semibold text-[#121212] dark:text-white font-mono uppercase">
+                8 NLP Unit Tests (FiGAS)
+              </h3>
+              <p class="text-xs text-[#6E6D6A] dark:text-[#9E9D99]">Uji negasi, intensifier, dan pembalikan arah polaritas</p>
+            </div>
+            <span id="ut-badge-status" class="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[#EDF3EC] text-[#2B6434] border border-[#D2E3D1]">
+              8/8 Lulus (100%)
+            </span>
+          </div>
+          <div class="space-y-2" id="unit-tests-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Comparison Matrix -->
+      <div class="rounded-lg bg-white dark:bg-[#14171D] border border-[#EAEAEA] dark:border-[#22262E] p-6 space-y-5">
+        <div>
+          <h3 class="text-sm font-semibold text-[#121212] dark:text-white font-mono uppercase">
+            Perbandingan Kinerja dengan Model Machine Learning (Data Uji 2020 &ndash; 2024)
+          </h3>
+          <p class="text-xs text-[#6E6D6A] dark:text-[#9E9D99] mt-0.5 font-serif italic">
+            Evaluasi objektif model pakar transparan versus model black box dan baseline mayoritas.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="models-comparison-cards">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Precision & Backtest Highlights -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#EAEAEA] dark:border-[#22262E]">
+          <div class="p-4 rounded border border-[#EAEAEA] dark:border-[#2A2E38] bg-[#FBFBFA] dark:bg-[#1A1E26] space-y-1.5">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-[#6E6D6A]">
+              Keunggulan Presisi BUY Kontrarian
+            </div>
+            <p class="text-xs text-[#6E6D6A] dark:text-[#A8A7A3] leading-relaxed">
+              Saat sistem memberikan sinyal <strong>BUY</strong>, presisi mencapai <strong>40.38%</strong>, melampaui peluang dasar pasar (<strong>32.95%</strong>) dengan keunggulan relatif +22.5%.
+            </p>
+          </div>
+
+          <div class="p-4 rounded border border-[#EAEAEA] dark:border-[#2A2E38] bg-[#FBFBFA] dark:bg-[#1A1E26] space-y-1.5">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-[#6E6D6A]">
+              Karakteristik Backtest Defensif
+            </div>
+            <p class="text-xs text-[#6E6D6A] dark:text-[#A8A7A3] leading-relaxed">
+              Return kumulatif Sistem Pakar tercatat <strong>+27.1%</strong> dengan posisi kas (HOLD) selama 84.3% hari perdagangan, menekan risiko gejolak pasar ekstrem.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: AUTHORS & ACADEMIC CREDITS (Utilitarian Minimalist Card) -->
+  <div id="authors-modal" class="fixed inset-0 z-50 bg-[#121212]/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#14171D] rounded-lg max-w-lg w-full p-6 border border-[#EAEAEA] dark:border-[#2A2F3A] shadow-xl space-y-5">
+      <div class="flex items-center justify-between border-b border-[#EAEAEA] dark:border-[#22262E] pb-3">
+        <div>
+          <h3 class="text-sm font-semibold tracking-tight text-[#121212] dark:text-white font-mono uppercase">
+            Tim Pengembang Proyek UTS
+          </h3>
+          <p class="text-xs text-[#6E6D6A] font-serif italic">Mata Kuliah Sistem Pakar &bull; Program Studi Informatika</p>
+        </div>
+        <button onclick="closeAuthorsModal()" class="text-[#9E9D99] hover:text-[#121212] dark:hover:text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="p-2.5 rounded border border-[#EAEAEA] dark:border-[#22262E] bg-[#FBFBFA] dark:bg-[#1A1E26]">
+            <div class="font-semibold text-[#121212] dark:text-white">Owen Antony</div>
+            <div class="font-mono text-[#6E6D6A] text-[11px]">412024002</div>
+          </div>
+          <div class="p-2.5 rounded border border-[#EAEAEA] dark:border-[#22262E] bg-[#FBFBFA] dark:bg-[#1A1E26]">
+            <div class="font-semibold text-[#121212] dark:text-white">Kristofer Ryan Giggs Eka S.</div>
+            <div class="font-mono text-[#6E6D6A] text-[11px]">412024005</div>
+          </div>
+          <div class="p-2.5 rounded border border-[#EAEAEA] dark:border-[#22262E] bg-[#FBFBFA] dark:bg-[#1A1E26]">
+            <div class="font-semibold text-[#121212] dark:text-white">Steven Iwan</div>
+            <div class="font-mono text-[#6E6D6A] text-[11px]">412024008</div>
+          </div>
+          <div class="p-2.5 rounded border border-[#EAEAEA] dark:border-[#22262E] bg-[#FBFBFA] dark:bg-[#1A1E26]">
+            <div class="font-semibold text-[#121212] dark:text-white">Gaddiel Abiyr Nesher Sitorus</div>
+            <div class="font-mono text-[#6E6D6A] text-[11px]">412024032</div>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-[#EAEAEA] dark:border-[#22262E] text-[11px] text-[#6E6D6A] dark:text-[#8C8B87] space-y-1">
+          <p><strong>Fakultas Teknologi Cerdas</strong></p>
+          <p class="font-serif italic">Berdasarkan acuan literatur Barbaglia, Consoli &amp; Manzan (2022) dan Maghyereh &amp; Abdoh (2022).</p>
+        </div>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="closeAuthorsModal()" class="px-4 py-1.5 text-xs font-mono font-medium rounded text-white dark:text-[#121212] bg-[#121212] dark:bg-white hover:bg-[#2B2B2B] dark:hover:bg-[#E0E0DE] transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
