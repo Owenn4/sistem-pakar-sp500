@@ -120,21 +120,25 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /* Aspect Color Badges (Calibrated Muted Pastels) */
-.aspect-economy       { background-color: #E1F3FE; color: #1F6C9F; border: 1px solid #C6E5FD; }
-.aspect-monetary      { background-color: #EDE8F7; color: #523A7E; border: 1px solid #D9CEF0; }
-.aspect-inflation     { background-color: #FBF3DB; color: #8C5E00; border: 1px solid #F5E6B8; }
-.aspect-unemployment  { background-color: #FDEFE6; color: #9A461E; border: 1px solid #F8D9C5; }
-.aspect-manufacturing { background-color: #EDF3EC; color: #2B6434; border: 1px solid #D2E3D1; }
-.aspect-financial     { background-color: #E6ECFA; color: #2E468A; border: 1px solid #CCD8F5; }
-.aspect-market        { background-color: #F0EFEA; color: #4E4D48; border: 1px solid #E0DFD8; }
+.aspect-economy          { background-color: #E1F3FE; color: #1F6C9F; border: 1px solid #C6E5FD; }
+.aspect-monetary         { background-color: #EDE8F7; color: #523A7E; border: 1px solid #D9CEF0; }
+.aspect-inflation        { background-color: #FBF3DB; color: #8C5E00; border: 1px solid #F5E6B8; }
+.aspect-unemployment     { background-color: #FDEFE6; color: #9A461E; border: 1px solid #F8D9C5; }
+.aspect-manufacturing    { background-color: #EDF3EC; color: #2B6434; border: 1px solid #D2E3D1; }
+.aspect-commodity_sector { background-color: #EDF3EC; color: #2B6434; border: 1px solid #D2E3D1; }
+.aspect-rupiah_fx        { background-color: #FDEFE6; color: #9A461E; border: 1px solid #F8D9C5; }
+.aspect-financial        { background-color: #E6ECFA; color: #2E468A; border: 1px solid #CCD8F5; }
+.aspect-market           { background-color: #F0EFEA; color: #4E4D48; border: 1px solid #E0DFD8; }
 
-.dark .aspect-economy       { background-color: rgba(31, 108, 159, 0.18); color: #82C4EE; border-color: rgba(130, 196, 238, 0.3); }
-.dark .aspect-monetary      { background-color: rgba(82, 58, 126, 0.18);  color: #BBA7DF; border-color: rgba(187, 167, 223, 0.3); }
-.dark .aspect-inflation     { background-color: rgba(140, 94, 0, 0.18);   color: #E2B653; border-color: rgba(226, 182, 83, 0.3); }
-.dark .aspect-unemployment  { background-color: rgba(154, 70, 30, 0.18);  color: #E69D7D; border-color: rgba(230, 157, 125, 0.3); }
-.dark .aspect-manufacturing { background-color: rgba(43, 100, 52, 0.18);  color: #88C493; border-color: rgba(136, 196, 147, 0.3); }
-.dark .aspect-financial     { background-color: rgba(46, 70, 138, 0.18);  color: #8EA7E8; border-color: rgba(142, 167, 232, 0.3); }
-.dark .aspect-market        { background-color: rgba(78, 77, 72, 0.18);   color: #C0BFB8; border-color: rgba(192, 191, 184, 0.3); }
+.dark .aspect-economy          { background-color: rgba(31, 108, 159, 0.18); color: #82C4EE; border-color: rgba(130, 196, 238, 0.3); }
+.dark .aspect-monetary         { background-color: rgba(82, 58, 126, 0.18);  color: #BBA7DF; border-color: rgba(187, 167, 223, 0.3); }
+.dark .aspect-inflation        { background-color: rgba(140, 94, 0, 0.18);   color: #E2B653; border-color: rgba(226, 182, 83, 0.3); }
+.dark .aspect-unemployment     { background-color: rgba(154, 70, 30, 0.18);  color: #E69D7D; border-color: rgba(230, 157, 125, 0.3); }
+.dark .aspect-manufacturing    { background-color: rgba(43, 100, 52, 0.18);  color: #88C493; border-color: rgba(136, 196, 147, 0.3); }
+.dark .aspect-commodity_sector { background-color: rgba(43, 100, 52, 0.18);  color: #88C493; border-color: rgba(136, 196, 147, 0.3); }
+.dark .aspect-rupiah_fx        { background-color: rgba(154, 70, 30, 0.18);  color: #E69D7D; border-color: rgba(230, 157, 125, 0.3); }
+.dark .aspect-financial        { background-color: rgba(46, 70, 138, 0.18);  color: #8EA7E8; border-color: rgba(142, 167, 232, 0.3); }
+.dark .aspect-market           { background-color: rgba(78, 77, 72, 0.18);   color: #C0BFB8; border-color: rgba(192, 191, 184, 0.3); }
 
 /* Navigation Tab States */
 .tab-btn.active-tab {
