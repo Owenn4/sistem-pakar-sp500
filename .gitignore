@@ -35,3 +35,8 @@ venv.bak/
 *.swp
 *.swo
 .luna/
+
+# graphify (skill, steering, and generated knowledge graph) - local only
+.kiro/skills/graphify/
+.kiro/steering/graphify.md
+graphify-out/
