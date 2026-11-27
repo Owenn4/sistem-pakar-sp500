@@ -1,0 +1,155 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Alur Program" id="alur-program-1">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- User -->
+        <mxCell id="n_user" value="User: input manual (headline/artikel)&#10;atau pilih ticker utk analisis live" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="20" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Endpoint decision -->
+        <mxCell id="n_endpoint" value="Endpoint FastAPI (main.py)&#10;/api/analyze atau /api/live-stock-analyze?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="620" y="120" width="280" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_live" value="/api/live-stock-analyze&#10;fetch_stock_indicators (yfinance: harga, MA20, RSI14, volatilitas)&#10;fetch_live_news_for_ticker (berita terbaru)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="900" y="260" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_manual" value="/api/analyze&#10;Pakai headlines/articles, trend, rsi,&#10;volatilitas dari input user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="300" y="260" width="280" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- NLP step -->
+        <mxCell id="n_nlp1" value="nlp.py: analyze_article_headline_vs_body&#10;per artikel" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="620" y="380" width="300" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_nlp2" value="Preprocess teks + Lexicon scoring&#10;-&gt; headline_score vs body_score" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="620" y="460" width="300" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_nlp3" value="Deteksi clickbait / divergensi judul vs isi&#10;(verification_status) + hitung aspect_scores&#10;(moneter, rupiah_fx, keuangan, inflasi, komoditas, ekonomi)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="600" y="540" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Fuzzification -->
+        <mxCell id="n_fuzz1" value="fuzzification.py: make_facts&#10;Agregasi semua artikel + indikator teknikal&#10;(65% berita ticker + 35% berita makro IHSG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="600" y="660" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_fuzz2" value="fuzzify&#10;Ubah nilai numerik -&gt; label linguistik&#10;(sent, trend, rsi, mon, rupiah, fin, comm, econ, ...)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="600" y="780" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Inference loop -->
+        <mxCell id="n_inf1" value="inference.py: infer()&#10;Mulai forward chaining pada 14 RULES (rules.py)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="600" y="900" width="340" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_inf_cond" value="Kondisi IF rule ke-i&#10;terpenuhi?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="650" y="990" width="240" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_inf_cf" value="CF_gabungan = CF_rule + CF_prev x (1 - CF_prev)&#10;(formula MYCIN) + catat fired_rule &amp; alasan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="960" y="1000" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_inf_next" value="Rule selanjutnya&#10;(i = i+1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="380" y="1000" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_inf_done" value="Semua 14 rule selesai dicek" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="650" y="1120" width="240" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_cf_compare" value="Bandingkan CF BUY vs CF SELL" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="650" y="1240" width="240" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_tie" value="CF sama -&gt; Tie-breaker&#10;(sentimen efektif + trend teknikal + RSI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="960" y="1250" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_buy" value="Decision = BUY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="440" y="1380" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_sell" value="Decision = SELL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="860" y="1380" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_resp" value="Susun JSON response:&#10;decision, certainty_factors, fired_rules, trace,&#10;linguistic_facts, numeric_facts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1470" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_ui" value="Frontend (static/app.js + templates/index.html)&#10;Render hasil BUY/SELL + alasan + rule aktif" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1580" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Offline benchmark pipeline -->
+        <mxCell id="n_off0" value="OFFLINE: scripts/build_indo_2y_dataset.py&#10;(dijalankan manual, bukan bagian dari request user)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1580" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_off1" value="yfinance history 2y per 7 ticker&#10;(^JKSE, BBCA, BBRI, BMRI, TLKM, ASII, ADRO)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1660" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_off2" value="Pasangkan korpus berita template&#10;(rasio keselarasan dihardcode ~62.5%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1740" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_off3" value="Jalankan infer() full vs headline-only&#10;utk setiap sampel" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1820" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_off4" value="Hitung metrik sklearn:&#10;accuracy, macro-F1, Logistic Regression, Random Forest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1900" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="n_off5" value="Simpan data/indo_historical_2y_dataset.json&#10;-&gt; dipakai endpoint /api/benchmarks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1980" width="360" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="n_user" target="n_endpoint"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" value="live ticker" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="n_endpoint" target="n_live"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="manual" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="n_endpoint" target="n_manual"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="n_live" target="n_nlp1" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="n_manual" target="n_nlp1" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="n_nlp1" target="n_nlp2" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="n_nlp2" target="n_nlp3" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="n_nlp3" target="n_fuzz1" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="n_fuzz1" target="n_fuzz2" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="n_fuzz2" target="n_inf1" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="n_inf1" target="n_inf_cond" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" value="ya" edge="1" parent="1" source="n_inf_cond" target="n_inf_cf" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" value="tidak" edge="1" parent="1" source="n_inf_cond" target="n_inf_next" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="n_inf_cf" target="n_inf_done" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="n_inf_next" target="n_inf_done" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16" value="belum selesai" edge="1" parent="1" source="n_inf_done" target="n_inf_cond" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;entryX=0;entryY=0.5;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e17" value="selesai" edge="1" parent="1" source="n_inf_done" target="n_cf_compare" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" value="BUY &gt; SELL" edge="1" parent="1" source="n_cf_compare" target="n_buy" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e19" value="SELL &gt; BUY" edge="1" parent="1" source="n_cf_compare" target="n_sell" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e20" value="CF sama" edge="1" parent="1" source="n_cf_compare" target="n_tie" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="n_tie" target="n_buy" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="n_tie" target="n_sell" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="n_buy" target="n_resp" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="n_sell" target="n_resp" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e25" edge="1" parent="1" source="n_resp" target="n_ui" style="edgeStyle=orthogonalEdgeStyle;html=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="eo1" edge="1" parent="1" source="n_off0" target="n_off1" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eo2" edge="1" parent="1" source="n_off1" target="n_off2" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eo3" edge="1" parent="1" source="n_off2" target="n_off3" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eo4" edge="1" parent="1" source="n_off3" target="n_off4" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eo5" edge="1" parent="1" source="n_off4" target="n_off5" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eo6" value="dibaca saat /api/benchmarks dipanggil" edge="1" parent="1" source="n_off5" target="n_resp" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
